@@ -1,4 +1,10 @@
 import numpy as np
+import nnfs
+from nnfs.datasets import spiral_data
+
+# sets default data type
+# sets same random seed
+nnfs.init()
 
 # neuron
 # O - w \
@@ -76,7 +82,8 @@ def feature_set():
           [2.0, 5.0, -1.0, 2.0],
           [-1.5, 2.7, 3.3, -0.8]]
 
-    np.random.seed(0)
+    # set by nnfs init
+    # np.random.seed(0)
     layer1 = LayerDense(4, 5)
     layer2 = LayerDense(5, 2)
     layer1.forward(X)
@@ -93,8 +100,48 @@ class LayerDense:
         self.output = np.dot(inputs, self.weights) + self.biases
 
 
+class Activation_ReLU:
+    def forward(self, inputs):
+        self.output = np.maximum(0, inputs)
+
 # batches
 #   calculate stuff in parallel
 #   helps with generalization
 
-feature_set()
+
+'''
+def create_data(points, classes):
+    X = np.zeros((points * classes, 2))  # data matrix (each row = single example)
+    y = np.zeros(points * classes, dtype='uint8')  # class labels
+    for class_number in range(classes):
+        ix = range(points * class_number, points * (class_number + 1))
+        r = np.linspace(0.0, 1, points)  # radius
+        t = np.linspace(class_number * 4, (class_number + 1) * 4, points) + np.random.randn(points) * 0.2  # theta
+        X[ix] = np.c_[r * np.sin(t), r * np.cos(t)]
+        y[ix] = class_number
+    return X, y
+
+import matplotlib.pyplot as plt
+
+X, y = create_data(100, 3)
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap="brg")
+plt.show()
+'''
+
+
+def activation_functions():
+    # custom for training data set
+    X, y = spiral_data(100, 3)
+
+    layer1 = LayerDense(2, 5)
+    activation1 = Activation_ReLU()
+    layer1.forward(X)
+    activation1.forward(layer1.output)
+
+    import matplotlib.pyplot as plt
+
+    plt.scatter(activation1.output[:, 0], activation1.output[:, 1], c=y, cmap="brg")
+    plt.show()
+
+
+activation_functions()
